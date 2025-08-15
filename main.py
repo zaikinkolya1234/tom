@@ -9,6 +9,7 @@ matplotlib.use('TkAgg')  # Безопасный бэкенд
 
 import json
 from typing import List, Dict, Any, Optional
+import os
 import matplotlib.pyplot as plt
 import numpy as np
 from matplotlib.colors import ListedColormap, BoundaryNorm
@@ -29,6 +30,16 @@ ARC_COLORS = [
 cmap = ListedColormap(ARC_COLORS)
 bounds = np.arange(-0.5, len(ARC_COLORS) + 0.5, 1.0)
 norm = BoundaryNorm(bounds, cmap.N)
+
+
+def simple_predict(train: List[Dict[str, Any]], test_input: List[List[int]]) -> List[List[int]]:
+    """
+    Простейший предиктор для демонстрационных целей.
+    Возвращает вход как предсказание.
+    """
+    # Здесь могла бы быть реализация алгоритма ARC.
+    # Пока возвращаем сам вход без изменений.
+    return test_input
 
 def draw_grid(ax: plt.Axes, array: List[List[int]], title: Optional[str] = None) -> None:
     """Рисует дискретную сетку с границами клеток."""
@@ -71,7 +82,12 @@ def visualize_arc_task(data: Dict[str, Any], save_path: Optional[str] = None) ->
     for j, pair in enumerate(tests, start=1):
         ax_in, ax_out = axes[row][0], axes[row][1]
         draw_grid(ax_in, pair["input"], title=f"test #{j} — input")
+
+        prediction = simple_predict(train, pair["input"])
+        print(f"\nTest #{j} prediction:\n{prediction}")
+
         if "output" in pair and pair["output"] is not None:
+            print(f"Test #{j} correct output:\n{pair['output']}")
             draw_grid(ax_out, pair["output"], title=f"test #{j} — output")
         else:
             ax_out.axis("off")
@@ -84,7 +100,7 @@ def visualize_arc_task(data: Dict[str, Any], save_path: Optional[str] = None) ->
     plt.show()
 
 if __name__ == "__main__":
-    file_path = r"D:\tom\ARC.txt"
+    file_path = os.path.join(os.path.dirname(__file__), "ARC.txt")
     with open(file_path, "r", encoding="utf-8") as f:
         content = f.read().strip()
     try:
